@@ -41,8 +41,8 @@ async function run() {
         });
 
         app.post("/user", async (req, res) => {
-            const { email, password, name } = req.body;
-            const User = { email, password, name };
+            const { email, password, name, role } = req.body;
+            const User = { email, password, name, role };
             console.log(email, password, name)
             try {
                 const existingUser = await UserCollection.findOne({ email });
