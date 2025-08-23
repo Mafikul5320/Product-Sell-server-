@@ -19,6 +19,7 @@ async function run() {
     try {
         const database = client.db("BuySell");
         const ProductColllection = database.collection("Product");
+        const UserCollection = database.collection("User");
 
         app.post("/product", async (req, res) => {
             const data = req.body;
@@ -37,6 +38,35 @@ async function run() {
                 return res.status(404).json({ message: "Product not found" });
             }
             res.json(product);
+        });
+
+        app.post("/user", async (req, res) => {
+            const { email, password, name } = req.body;
+            const User = { email, password, name };
+            console.log(email, password, name)
+            try {
+                const existingUser = await UserCollection.findOne({ email });
+                console.log(existingUser)
+                if (existingUser) {
+                    return res.status(200).send({ message: "user already register", inserted: false });
+                }
+                const result = await UserCollection.insertOne(User);
+                res.status(200).send(result)
+            } catch (error) {
+                res.status(500).json({ error: error.message });
+            }
+        });
+
+        app.get("/user", async (req, res) => {
+            const email = req.query.email;
+            console.log(email)
+            try {
+                const premiumUser = await UserCollection.findOne({ email })
+                res.status(200).send(premiumUser);
+            } catch (error) {
+                console.error("Error fetching users:", error);
+                res.status(500).send("Failed to get users");
+            }
         });
 
         // await client.db("admin").command({ ping: 1 });
